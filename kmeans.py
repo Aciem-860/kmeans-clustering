@@ -1,6 +1,5 @@
-import numpy as np
-import random as rd
-import matplotlib.pyplot as plt
+import random
+import os
 
 def kmeans(k, points, repetition):
     """
@@ -11,7 +10,7 @@ def kmeans(k, points, repetition):
     # initialisation
     init_indices = []
     while len(init_indices) < k:
-        index = rd.randint(0, len(points)-1)
+        index = random.randint(0, len(points)-1)
         if index not in init_indices:
             init_indices.append(index)
 
@@ -31,37 +30,38 @@ def kmeans(k, points, repetition):
     #  On fait cela autant de fois que désiré                                                   #
     #############################################################################################
     
-    for i in range(repetition):
-        centroids = []
-        for c in clusters:
-            m = []
-            m = [0 for _ in range(len(points[0]))] # i-ème élément de m : moyenne de la i-ème coordonnée
-                                                   # des pts du cluster
-            for x in c:
-                for j in range(len(x)):
-                    m[j] = x[j]
+    for _ in range(repetition):
+        ### AFFICHAGE AVANCEE ###
+        os.system("cls")
+        quantity = int(_ * 20/repetition)
+        prog = "#" * quantity
+        mprog = "-" * (20 - quantity)
+        print("Progression : {}{} * {}% ({}/{})".format(prog, mprog, int(_*100/repetition), _, repetition))
+        #########################
 
-            for j in range(len(m)):
-                m[j] /= len(points)
-            centroids.append(m)
+        centroids = []
+        nb_coordinates = len(points[0])
+        for c in clusters:
+            mean = []
+            for i in range(nb_coordinates):
+                s = 0
+                for l in c:
+                    s += l[i]
+                mean.append(s/len(c))
+            centroids.append(mean)
 
         clusters = [[] for _ in range(k)]
         
         for x in points:
             index = closest_point(x, centroids)
             clusters[index].append(x)
-
-    i = 0
-    COLOR = ['blue', 'red', 'green']
-    for c in clusters:
-        x, y = [], []
-        for p in c:
-            x.append(p[0])
-            y.append(p[1])
-        plt.scatter(x,y , color = COLOR[i])
-        i += 1
-    plt.show()
         
+    # on bricole un peu pour avoir un beau message "100%"
+    os.system("cls")
+    print("Progression : #################### * 100% ({}/{})".format(repetition, repetition))
+    # on retourne les clusters
+    return clusters
+
 
 def mean(points):
     """
@@ -89,12 +89,3 @@ def distance2(x, y):
     for i in range(len(x)):
         d += (x[i] - y[i])**2
     return d
-
-points = [[0,0], [1,1], [100,0], [100, 2], [20, 15], [21,17]]
-x, y = [], []
-
-for p in points:
-    x.append(p[0])
-    y.append(p[1])
-
-kmeans(3, [[0,0], [1,5], [1010,0], [1000, 2], [20, 15], [21,17], [18,15]], 100)
